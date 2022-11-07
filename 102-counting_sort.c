@@ -2,52 +2,49 @@
 #include <stdlib.h>
 
 /**
- *counting_sort - sort and array by counting sort method
- *@array: input array to be sorted
- *@size: size of the array
+ * counting_sort - sorts an array of integers in ascending order
+ * using the Counting sort algorithm
+ * @array: Array to be sorted
+ * @size: size of the array
  *
- *Return: Nothing,
+ * Return: void
  */
 void counting_sort(int *array, size_t size)
 {
-	size_t k;
-	int max_num, i;
-	int *count_array, *sort_array = malloc(size * sizeof(int));
+	int *count_arr, k;
+	size_t i, j, arr_size;
 
-	if (size < 2)
+	if (array == NULL || size <= 1)
 		return;
-	max_num = array[0];
-	if (sort_array == NULL)
+	arr_size = array[0];
+	for (i = 0; array[i]; i++)
 	{
-		free(sort_array);
+		if (array[i] > (int)arr_size)
+			arr_size = array[i];
+	}
+
+	arr_size += 1;
+
+	count_arr = malloc(arr_size * sizeof(int *));
+	if (count_arr == NULL)
 		return;
-	}
-	for (k = 0; k < size; k++)
-		sort_array[k] = array[k];
-	for (k = 0; k < size; k++)
-	{
-		if (array[k] > max_num)
-			max_num = array[k];
-	}
-	count_array = malloc((max_num + 1) * sizeof(int));
-	if (count_array == NULL)
-	{
-		free(count_array);
-			return;
-	}
-	for (i = 0; i <= max_num; i++)
-		count_array[i] = 0;
-	for (k = 0; k < size; k++)
-		count_array[array[k]]++;
-	for (i = 1; i <= max_num; i++)
-		count_array[i] = count_array[i] + count_array[i - 1];
-	print_array(count_array, max_num + 1);
-	for (k = 0; k < size; k++)
-	{
-		sort_array[count_array[array[k]] - 1] = array[k];
-		count_array[array[k]] = count_array[array[k]] - 1;
-	}
-	for (k = 0; k < size; k++)
-		array[k] = sort_array[k];
-	free(count_array), free(sort_array);
+
+	for (i = 0; i < arr_size; i++)
+		count_arr[i] = 0;
+
+	for (i = 0; i < size; i++)
+		count_arr[array[i]] += 1;
+
+	for (i = 0; i <= arr_size; i++)
+		count_arr[i] += count_arr[i - 1];
+
+	print_array(count_arr, arr_size);
+
+	for (i = 1, j = 0; i <= arr_size; i++)
+		if (count_arr[i] != count_arr[i - 1])
+		{
+			for (k = 0; k < count_arr[i] - count_arr[i - 1]; k++)
+				array[j++] = i;
+		}
+	free(count_arr);
 }
