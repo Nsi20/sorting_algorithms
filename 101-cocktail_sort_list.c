@@ -1,71 +1,67 @@
 #include "sort.h"
-
+#include <stdio.h>
 /**
- *swap_nodes - swap current and next node positon
- *@list: cuarrent position of a linked list
- *
- *Return: Nothing it's a void functions
+ *swap_node - swap a node for his previous one
+ *@node: node
+ *@list: node list
+ *Return: return a pointer to a node which was enter it
  */
-void swap_nodes(listint_t **list)
+listint_t *swap_node(listint_t *node, listint_t **list)
 {
-	listint_t *cpy_list, *cmp_node, *save_node;
+	listint_t *back = node->prev, *current = node;
+	/*NULL, 19, 48, 9, 71, 13, NULL*/
 
-	cpy_list = *list;
-	cmp_node = cpy_list->next;
-	save_node = cpy_list->prev;
-	cpy_list->next = cmp_node->next;
-	cpy_list->prev = cmp_node;
-	if (cmp_node->next != NULL)
-		cmp_node->next->prev = cpy_list;
-	cmp_node->next = cpy_list;
-	cmp_node->prev = save_node;
-	if (save_node != NULL)
-		save_node->next = cmp_node;
+	back->next = current->next;
+	if (current->next)
+		current->next->prev = back;
+	current->next = back;
+	current->prev = back->prev;
+	back->prev = current;
+	if (current->prev)
+		current->prev->next = current;
+	else
+		*list = current;
+	return (current);
 }
 /**
- *cocktail_sort_list - sort double linked list with cocktail sort
- *@list: double linked list to sort
- *
- *Return: Nothing, it's a void function
+ *cocktail_sort_list - this is a cocktail sort implementation
+ *working on a double linked lists
+ *@list: list
  */
 void cocktail_sort_list(listint_t **list)
 {
-	int swap, v_act, v_nxt;
-	listint_t *cpy_list;
+	listint_t *node;
+	int swap_done = 1;
 
-	cpy_list = *list;
-	swap = 0;
-	do {
-		while (cpy_list->next != NULL)
+	if (list == '\0' || (*list) == '\0' || (*list)->next == '\0')
+		return;
+	node = *list;
+	while (swap_done == 1)
+	{
+		swap_done = 0;
+		while (node->next)
 		{
-			v_act = cpy_list->n;
-			v_nxt = cpy_list->next->n;
-			if (v_act > v_nxt)
+			if (node->n > node->next->n)
 			{
-				swap_nodes(&cpy_list);
-				swap = 1;
+				node = swap_node(node->next, list);
+				swap_done = 1;
 				print_list(*list);
 			}
-			else
-				cpy_list = cpy_list->next;
+			node = node->next;
 		}
-		if (swap == 0)
+		if (swap_done == 0)
 			break;
-		swap = 0;
-		while (cpy_list->prev != NULL)
+		swap_done = 0;
+		while (node->prev)
 		{
-			v_act = cpy_list->n;
-			v_nxt = cpy_list->prev->n;
-			if (v_act < v_nxt)
+			if (node->n < node->prev->n)
 			{
-				swap_nodes(&(cpy_list->prev));
-				swap = 1;
-				if (cpy_list->prev == NULL)
-					*list = cpy_list;
+				node = swap_node(node, list);
+				swap_done = 1;
 				print_list(*list);
 			}
 			else
-				cpy_list = cpy_list->prev;
+				node = node->prev;
 		}
-	} while (swap == 1);
+	}
 }
